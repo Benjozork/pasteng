@@ -11,11 +11,12 @@ private val logger = LoggerFactory.getLogger("pasteng-ws-messaging")
 
 private const val DEFAUT_MESSAGE_PREFIX = "pasteng:"
 
-private suspend fun baseSend(channel: SendChannel<Frame>, text: String) = channel.send(Frame.Text("$DEFAUT_MESSAGE_PREFIX$text"))
+private suspend fun baseSend(channel: SendChannel<Frame>, text: String, content: String?)
+        = channel.send(Frame.Text("$DEFAUT_MESSAGE_PREFIX$text" + (content?.let { " $it" } ?: "")))
 
-suspend fun SendChannel<Frame>.send(message: Message) = baseSend(this, message.text)
+suspend fun SendChannel<Frame>.send(message: Pair<Message, String?>) = baseSend(this, message.first.text, message.second)
 
-suspend fun SendChannel<Frame>.send(error: Error) = baseSend(this, error.text)
+suspend fun SendChannel<Frame>.send(error: Error) = baseSend(this, error.text, null)
 
 suspend fun SendChannel<Frame>.send(text: String) = this.send(Frame.Text(text))
 

@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+
+<!--suppress HtmlFormInputWithoutLabel -->
 <html lang="en">
 
     <head>
@@ -10,8 +12,17 @@
     <body>
         pasteNG
 
-        <button id="ws-button">Test</button>
-        <span id="ws-receive"></span>
+        <h2>Send</h2>
+
+        <input id="ws-send-text" type="text" />
+        <button id="ws-send-button">Send</button>
+        <span id="ws-send-result"></span>
+
+        <h2>Receive</h2>
+
+        <input id="ws-receive-text" type="text" />
+        <button id="ws-receive-button">Receive</button>
+        <span id="ws-receive-result"></span>
 
         <script src="ts/websocket.ts"></script>
     </body>

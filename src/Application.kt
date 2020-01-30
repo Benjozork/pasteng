@@ -20,12 +20,16 @@ import java.time.*
 import java.io.File
 
 import com.fasterxml.jackson.databind.*
+import pasteng.models.Paste
+import kotlin.random.Random
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
+
+    val storedMessages: MutableMap<Int, Paste> = mutableMapOf()
 
     install(CallLogging) {
         level = Level.INFO
@@ -64,11 +68,24 @@ fun Application.module(testing: Boolean = false) {
                                 }
 
                                 Message.OPEN -> {
-                                    outgoing.send("${it.second}, opened !")
+                                    val id = it.second.toIntOrNull() ?: return@let
+
+                                    val paste = storedMessages[id]
+
+                                    if (paste != null) {
+                                        outgoing.send(Message.OK to paste.content)
+                                    } else {
+                                        outgoing.send(Error.INTERNAL_ERROR)
+                                    }
                                 }
 
                                 Message.NEW -> {
-                                    outgoing.send("${it.second}, created !")
+                                    val content = it.second
+
+                                    val id = Random.nextInt(0, 1000)
+                                    storedMessages[id] = Paste(content)
+
+                                    outgoing.send(Message.CREATED to id.toString())
                                 }
                             }
                         } ?: outgoing.send(Error.UNRECOGNIZED_COMMAND)
