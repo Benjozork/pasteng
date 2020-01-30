@@ -1,0 +1,10 @@
+/.gradle
+/.idea
+/out
+/build
+*.iml
+*.ipr
+*.iws
+/client/src/app/dist/
+/client/src/app/.cache/
+/client/src/app/node_modules/
