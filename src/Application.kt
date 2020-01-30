@@ -7,8 +7,12 @@ import io.ktor.http.content.*
 import io.ktor.features.*
 import io.ktor.jackson.*
 import io.ktor.websocket.webSocket
-import io.ktor.http.cio.websocket.readText
 import io.ktor.http.cio.websocket.Frame
+
+import pasteng.ws.Message
+import pasteng.ws.receiveMessage
+import pasteng.ws.Error
+import pasteng.ws.send
 
 import org.slf4j.event.*
 
@@ -16,7 +20,6 @@ import java.time.*
 import java.io.File
 
 import com.fasterxml.jackson.databind.*
-
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -54,13 +57,21 @@ fun Application.module(testing: Boolean = false) {
             for (frame in incoming) {
                 when (frame) {
                     is Frame.Text -> {
-                        val text = frame.readText()
+                        frame.receiveMessage()?.let {
+                            when (it.first) {
+                                Message.ECHO -> {
+                                    outgoing.send("${it.second}, received !")
+                                }
 
-                        if (text.startsWith("pasteng:")) {
-                            val pasteNgCommand = text.substringAfter("pasteng:")
+                                Message.OPEN -> {
+                                    outgoing.send("${it.second}, opened !")
+                                }
 
-                            outgoing.send(Frame.Text(pasteNgCommand))
-                        }
+                                Message.NEW -> {
+                                    outgoing.send("${it.second}, created !")
+                                }
+                            }
+                        } ?: outgoing.send(Error.UNRECOGNIZED_COMMAND)
                     }
                 }
             }
