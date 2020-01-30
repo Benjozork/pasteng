@@ -27,8 +27,10 @@ private fun baseReceive(frame: Frame.Text): Pair<Message, String>? {
         Message.parse(rawMessage)?.let {
             it to raw.substringAfter(" ")
         }.also {
-            it ?.let { logger.debug("recv message '${it.first}'") }
-                ?: logger.debug("recv failed")
+            if (it != null)
+                logger.debug("recv message '${it.first}'")
+            else
+                logger.debug("recv failed")
         }
     } else null
 }
